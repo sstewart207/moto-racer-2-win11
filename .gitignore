@@ -1,0 +1,17 @@
+# Allowlist: only our notes, tools and configs. NEVER the game (copyrighted), archives, or screenshots.
+/*
+!/.gitignore
+!/README.md
+!/*.md
+!/register-mr2.ps1
+!/game-config/
+!/mr2-tools/
+/mr2-tools/*
+!/mr2-tools/*.py
+!/mr2-tools/*.ps1
+!/mr2-tools/*.cs
+!/mr2-tools/*.md
+!/mr2-tools/*.csv
+!/mr2-tools/p1-keyboard-bindings.bin
+/mr2-tools/sysmute-state.json
+/mr2-tools/*.log
