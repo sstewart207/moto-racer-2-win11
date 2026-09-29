@@ -1,3 +1,5 @@
+> # 🎮 DELIVERABLE (session 7): **`C:\GOG Games\Moto Racer 2\MotoRacer2Launcher.exe`** — desktop shortcut points at it. Source `mr2-tools\launcher\MotoRacer2Launcher.cs`, build `build.ps1`. Starts the game, auto-detects Xbox/DualSense/keyboard, writes P1 table (MD5-guarded), menu + XInput trigger helper; log at `%TEMP%\MotoRacer2Launcher.log`. Self-test: `MotoRacer2Launcher.exe --selftest <dir>` dumps its 3 tables (verified byte-identical to the proven padprofile layouts). Live-tested with NO pad (keyboard path) — Xbox/DualSense path in the exe not yet live-tested with a pad plugged in.
+
 > # 🏁 FINISHED (session 7, 2026-09-28 ~12:00) — **DONE. Next session: just verify with the user, don't rebuild.**
 > - **Desktop shortcut → `C:\GOG Games\Moto Racer 2\launch-mr2.ps1`** → game (widescreen 2560x1440 @144, vol 100%) + `mr2-tools\padhelper.ps1` (PS-style menus: Options/○ = ESC, D-pad = arrows, ✕ = ENTER; only while game is foreground; exits with game).
 > - Race controls on DualSense saved in config.bin (R2 gas, L2 brake, ✕ turbo, R1/L1 gears, △ view, □ look back).

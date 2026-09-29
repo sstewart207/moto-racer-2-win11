@@ -15,3 +15,7 @@
 !/mr2-tools/p1-keyboard-bindings.bin
 /mr2-tools/sysmute-state.json
 /mr2-tools/*.log
+!/mr2-tools/launcher/
+/mr2-tools/launcher/*
+!/mr2-tools/launcher/*.cs
+!/mr2-tools/launcher/build.ps1
