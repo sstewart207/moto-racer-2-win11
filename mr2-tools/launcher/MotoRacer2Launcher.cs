@@ -26,7 +26,8 @@ static class Launcher
 
     // ---- Win32 ---------------------------------------------------------------------------------
     [DllImport("kernel32.dll")] static extern IntPtr OpenProcess(int access, bool inherit, int pid);
-    [DllImport("kernel32.dll")] static extern bool WriteProcessMemory(IntPtr h, IntPtr a, byte[] b, int n, out int w);
+    // nSize / lpNumberOfBytesWritten are SIZE_T: must be pointer-sized on 64-bit Windows.
+    [DllImport("kernel32.dll")] static extern bool WriteProcessMemory(IntPtr h, IntPtr a, byte[] b, UIntPtr n, out UIntPtr w);
     [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
     [DllImport("user32.dll")] static extern void keybd_event(byte vk, byte scan, uint flags, UIntPtr extra);
     [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
@@ -50,7 +51,7 @@ static class Launcher
     // Keyboard record: [+0 type=1][+4 dev=1][+12 DIK code][+16 1][+18 scan][+19 extended]
     static readonly int[,] Keys = { { 0xCB, 0x4B, 1 }, { 0xCD, 0x4D, 1 }, { 0xC8, 0x48, 1 }, { 0xD0, 0x50, 1 },
                                     { 0x39, 0x39, 0 }, { 0x10, 0x10, 0 }, { 0x11, 0x11, 0 }, { 0x12, 0x12, 0 }, { 0x0F, 0x0F, 0 } };
-    // Joystick record: [+0 type=4][+4 dev=1][+12 button# or axis#][+15 C0 axis-, A0 axis+, 0 button]
+    // Joystick record: [+0 type=4][+4 dev = game joystick #, 1-based][+12 button# or axis#][+15 C0 axis-, A0 axis+, 0 button]
     // DualSense (DirectInput): 1 Sq 2 Cross 3 Circle 4 Tri 5 L1 6 R1 7 L2 8 R2
     static readonly int[,] DualSense = { { 1, 0xC0 }, { 1, 0xA0 }, { 8, 0 }, { 7, 0 }, { 2, 0 }, { 6, 0 }, { 5, 0 }, { 4, 0 }, { 1, 0 } };
     // Xbox (DirectInput): 1 A 2 B 3 X 4 Y 5 LB 6 RB. ACCEL/BRAKE (-1) stay keyboard UP/DOWN, fed from XInput RT/LT.
@@ -58,7 +59,7 @@ static class Launcher
 
     enum Pad { None, Xbox, DualSense }
 
-    static byte[] BuildTable(Pad pad)
+    static byte[] BuildTable(Pad pad, int gameJoy)
     {
         var t = new byte[216];
         int[,] joy = pad == Pad.Xbox ? Xbox : pad == Pad.DualSense ? DualSense : null;
@@ -70,31 +71,33 @@ static class Launcher
                 t[o] = 1; t[o + 4] = 1; t[o + 12] = (byte)Keys[f, 0];
                 t[o + 16] = 1; t[o + 18] = (byte)Keys[f, 1]; t[o + 19] = (byte)Keys[f, 2];
             }
-            else { t[o] = 4; t[o + 4] = 1; t[o + 12] = (byte)joy[f, 0]; t[o + 15] = (byte)joy[f, 1]; }
+            else { t[o] = 4; t[o + 4] = (byte)gameJoy; t[o + 12] = (byte)joy[f, 0]; t[o + 15] = (byte)joy[f, 1]; }
         }
         return t;
     }
 
-    static int FindJoystick(out Pad pad)
+    static int FindJoystick(out Pad pad, out int gameJoy)
     {
-        pad = Pad.None;
+        pad = Pad.None; gameJoy = 0;
         for (int id = 0; id < 16; id++)
         {
             var ji = new JoyInfo { Size = Marshal.SizeOf(typeof(JoyInfo)), Flags = 0xFF };
             if (joyGetPosEx(id, ref ji) != 0) continue;
             var jc = new JoyCaps(); joyGetDevCaps(id, ref jc, Marshal.SizeOf(typeof(JoyCaps)));
-            pad = jc.Mid == 0x045E ? Pad.Xbox : jc.Mid == 0x054C ? Pad.DualSense : Pad.None;
-            return pad == Pad.None ? -1 : id;
+            gameJoy++;                                       // the game numbers present joysticks 1, 2, ...
+            if (jc.Mid == 0x045E) { pad = Pad.Xbox; return id; }
+            if (jc.Mid == 0x054C) { pad = Pad.DualSense; return id; }
+            // unsupported device (wheel, vJoy, ...): keep scanning for a supported pad
         }
         return -1;
     }
 
-    static bool WriteTable(Process game, Pad pad)
+    static bool WriteTable(Process game, Pad pad, int gameJoy)
     {
         IntPtr h = OpenProcess(0x0438, false, game.Id);
         if (h == IntPtr.Zero) return false;
-        int w; var t = BuildTable(pad);
-        bool ok = WriteProcessMemory(h, (IntPtr)P1Table, t, t.Length, out w) && w == t.Length;
+        UIntPtr w; var t = BuildTable(pad, gameJoy);
+        bool ok = WriteProcessMemory(h, (IntPtr)P1Table, t, (UIntPtr)t.Length, out w) && w.ToUInt64() == (ulong)t.Length;
         CloseHandle(h); return ok;
     }
 
@@ -113,9 +116,9 @@ static class Launcher
     {
         if (args.Length == 2 && args[0] == "--selftest")        // dump the three tables for byte-for-byte checks
         {
-            File.WriteAllBytes(Path.Combine(args[1], "table-keyboard.bin"), BuildTable(Pad.None));
-            File.WriteAllBytes(Path.Combine(args[1], "table-xbox.bin"), BuildTable(Pad.Xbox));
-            File.WriteAllBytes(Path.Combine(args[1], "table-dualsense.bin"), BuildTable(Pad.DualSense));
+            File.WriteAllBytes(Path.Combine(args[1], "table-keyboard.bin"), BuildTable(Pad.None, 1));
+            File.WriteAllBytes(Path.Combine(args[1], "table-xbox.bin"), BuildTable(Pad.Xbox, 1));
+            File.WriteAllBytes(Path.Combine(args[1], "table-dualsense.bin"), BuildTable(Pad.DualSense, 1));
             return;
         }
         if (!File.Exists(GameExe)) { Fail("Can't find " + GameExe); return; }
@@ -128,9 +131,9 @@ static class Launcher
         for (int i = 0; i < 300 && !game.HasExited && game.MainWindowHandle == IntPtr.Zero; i++) { Thread.Sleep(100); game.Refresh(); }
 
         var started = Stopwatch.StartNew();
-        Pad pad; int joy = FindJoystick(out pad);
+        Pad pad; int gameJoy; int joy = FindJoystick(out pad, out gameJoy);
         try { File.Delete(LogPath); } catch { }
-        Log("start: knownBuild=" + knownBuild + " pad=" + pad + " joy=" + joy + " window=" + game.MainWindowHandle);
+        Log("start: knownBuild=" + knownBuild + " pad=" + pad + " joy=" + joy + " gameJoy=" + gameJoy + " window=" + game.MainWindowHandle);
         Pad written = (Pad)(-1); int writes = 0;
         int prevButtons = 0, prevPov = -1;
         bool gas = false, brake = false; long lastDetect = 0;
@@ -139,10 +142,10 @@ static class Launcher
         {
             // Re-detect the pad every ~2 s (hot-plug / swap), and write the table at 4 s and 8 s after start
             // (a late settings load must not overwrite it) and whenever the pad type changes.
-            if (started.ElapsedMilliseconds - lastDetect > 2000) { joy = FindJoystick(out pad); lastDetect = started.ElapsedMilliseconds; }
+            if (started.ElapsedMilliseconds - lastDetect > 2000) { joy = FindJoystick(out pad, out gameJoy); lastDetect = started.ElapsedMilliseconds; }
             long ms = started.ElapsedMilliseconds;
             if (knownBuild && ((writes == 0 && ms > 4000) || (writes == 1 && ms > 8000) || (writes >= 2 && pad != written)))
-            { bool ok = WriteTable(game, pad); Log("write #" + writes + " pad=" + pad + " at " + ms + " ms ok=" + ok); if (ok) { written = pad; writes++; } else writes++; }
+            { bool ok = WriteTable(game, pad, gameJoy); Log("write #" + writes + " pad=" + pad + " at " + ms + " ms ok=" + ok); if (ok) { written = pad; writes++; } else writes++; }
 
             bool focus = Focused(game);
             int buttons = 0, pov = -1;
