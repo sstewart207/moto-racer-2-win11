@@ -16,7 +16,9 @@ Getting Delphine's **Moto Racer 2** (1998, GOG build) running properly on Window
 1. Install the GOG game to `C:\GOG Games\Moto Racer 2\`, add dgVoodoo's `DDraw.dll` + `D3DImm.dll`.
 2. Copy `game-config\dgVoodoo.conf`, `motoracer2.ini`, `launch-mr2.ps1` into the game folder.
 3. In game: OPTIONS → DISPLAY → FULL SCREEN = **960×540** → OK (once).
-4. Launch with `launch-mr2.ps1` (the desktop shortcut runs `powershell -File launch-mr2.ps1`).
+4. Build the launcher once: `mr2-tools\launcher\build.ps1` (uses the C# compiler built into Windows) - it installs
+   **`MotoRacer2Launcher.exe`** into the game folder. Point your desktop shortcut at it and double-click to play.
+   (`launch-mr2.ps1` still works too.)
 
 ## Controls
 
