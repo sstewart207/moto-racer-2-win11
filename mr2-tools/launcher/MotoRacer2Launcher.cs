@@ -52,8 +52,8 @@ static class Launcher
     static readonly int[,] Keys = { { 0xCB, 0x4B, 1 }, { 0xCD, 0x4D, 1 }, { 0xC8, 0x48, 1 }, { 0xD0, 0x50, 1 },
                                     { 0x39, 0x39, 0 }, { 0x10, 0x10, 0 }, { 0x11, 0x11, 0 }, { 0x12, 0x12, 0 }, { 0x0F, 0x0F, 0 } };
     // Joystick record: [+0 type=4][+4 dev = game joystick #, 1-based][+12 button# or axis#][+15 C0 axis-, A0 axis+, 0 button]
-    // DualSense (DirectInput): 1 Sq 2 Cross 3 Circle 4 Tri 5 L1 6 R1 7 L2 8 R2
-    static readonly int[,] DualSense = { { 1, 0xC0 }, { 1, 0xA0 }, { 8, 0 }, { 7, 0 }, { 2, 0 }, { 6, 0 }, { 5, 0 }, { 4, 0 }, { 1, 0 } };
+    // DualSense AS THE GAME SEES IT through dinput.dll proxy (Xbox order): 1 Cross 2 Circle 3 Square 4 Tri 5 L1 6 R1 7 L2 8 R2
+    static readonly int[,] DualSense = { { 1, 0xC0 }, { 1, 0xA0 }, { 8, 0 }, { 7, 0 }, { 1, 0 }, { 6, 0 }, { 5, 0 }, { 4, 0 }, { 3, 0 } };
     // Xbox (DirectInput): 1 A 2 B 3 X 4 Y 5 LB 6 RB. ACCEL/BRAKE (-1) stay keyboard UP/DOWN, fed from XInput RT/LT.
     static readonly int[,] Xbox = { { 1, 0xC0 }, { 1, 0xA0 }, { -1, 0 }, { -1, 0 }, { 1, 0 }, { 6, 0 }, { 5, 0 }, { 4, 0 }, { 3, 0 } };
 
@@ -157,7 +157,7 @@ static class Launcher
             int pressed = buttons & ~prevButtons;
             int bPause = pad == Pad.Xbox ? 1 << 7 : 1 << 9;   // Menu / Options
             int bBack  = pad == Pad.Xbox ? 1 << 1 : 1 << 2;   // B / Circle
-            int bOk    = pad == Pad.Xbox ? 1 << 0 : 1 << 1;   // A / Cross
+
 
             if (pad == Pad.Xbox)
             {
@@ -170,7 +170,8 @@ static class Launcher
             if (focus && pad != Pad.None)
             {
                 if ((pressed & bPause) != 0 || (pressed & bBack) != 0) Tap(0x1B, 0x01, false); // ESC
-                if ((pressed & bOk) != 0) Tap(0x0D, 0x1C, false);                             // ENTER
+                // OK (A / Cross) is NOT sent: the game natively treats joystick button 1 as OK, and the
+                // dinput.dll proxy makes Cross = button 1. Sending ENTER too would double-select.
                 if (pov >= 0 && pov != prevPov)
                 {
                     if (pov >= 315 || pov <= 45) Tap(0x26, 0x48, true);

@@ -19,3 +19,9 @@
 /mr2-tools/launcher/*
 !/mr2-tools/launcher/*.cs
 !/mr2-tools/launcher/build.ps1
+!/mr2-tools/dinputproxy/
+/mr2-tools/dinputproxy/*
+!/mr2-tools/dinputproxy/*.cpp
+!/mr2-tools/dinputproxy/*.def
+!/mr2-tools/padinject.ps1
+!/mr2-tools/buttonlog.ps1
