@@ -37,7 +37,11 @@ if ($Profile -eq 'auto') {
     $Profile = switch ($vid) { 0x045E { 'xbox' } 0x054C { 'dualsense' } default { '' } }
     if (-not $Profile) { $Profile = 'keyboard' }   # no pad: original keyboard layout
 }
-$p = Get-Process moto -EA Stop; $h = [PP]::OpenProcess(0x0438, $false, $p.Id); $r = 0
+$p = Get-Process moto -EA Stop
+# 0x6421CB is only valid for the GOG build (moto.exe MD5 598D38990563...). Refuse anything else.
+$md5 = (Get-FileHash $p.Path -Algorithm MD5).Hash
+if (-not $md5.StartsWith("598D38990563")) { "REFUSED: $($p.Path) MD5 $md5 is not the GOG build - binding table address unknown"; exit 3 }
+$h = [PP]::OpenProcess(0x0438, $false, $p.Id); $r = 0
 if ($Profile -eq 'keyboard') { $b = [IO.File]::ReadAllBytes("$PSScriptRoot\p1-keyboard-bindings.bin") }
 else { $b = New-Object byte[] 216 }
 for ($f = 0; $f -lt 9 -and $Profile -ne 'keyboard'; $f++) {
