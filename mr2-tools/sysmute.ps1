@@ -69,8 +69,13 @@ Add-Type -TypeDefinition $src
 $state = Join-Path $PSScriptRoot 'sysmute-state.json'
 
 if ($Mute) {
-    if (Test-Path $state) { Write-Host "state file already exists - NOT overwriting it (it holds the pre-mute state). Muting anyway." }
-    else { [SysMute]::List() | % { [pscustomobject]@{ Id = $_[0]; Muted = $_[1] -eq '1'; Vol = [int]$_[2] } } | ConvertTo-Json | Set-Content $state }
+    # Keep the ORIGINAL pre-mute state of devices already recorded, but add any device plugged in
+    # since the last -Mute (e.g. a DualSense speaker), so -Restore covers it too.
+    $known = @(); if (Test-Path $state) { $known = @((Get-Content $state -Raw | ConvertFrom-Json) | % { $_ }) }
+    $ids = $known | % { $_.Id }
+    $added = [SysMute]::List() | ? { $ids -notcontains $_[0] } | % { [pscustomobject]@{ Id = $_[0]; Muted = $_[1] -eq '1'; Vol = [int]$_[2] } }
+    if ($added) { "recording new device(s): " + (($added | % { $_.Id }) -join ', ') }
+    ConvertTo-Json -InputObject @($known + @($added)) | Set-Content $state
     [SysMute]::List() | % { "mute {0} -> hr={1}" -f $_[0], [SysMute]::Set($_[0], $true) }
 }
 elseif ($Restore) {
