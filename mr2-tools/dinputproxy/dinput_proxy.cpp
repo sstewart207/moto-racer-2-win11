@@ -55,6 +55,10 @@ public:
             m_lastRaw = raw; m_lastPov = js->rgdwPOV[0]; m_changes++;
         }
         if (m_ds) { BYTE in[4]; for (int i = 0; i < 4; i++) in[i] = js->rgbButtons[i]; for (int i = 0; i < 4; i++) js->rgbButtons[i] = in[kMap[i]]; }
+        // Hide game button 2 (Circle / B) and the D-pad from the game: MotoRacer2Launcher's helper turns
+        // them into Esc / arrow keys, so a native reaction as well would count every press twice (#16).
+        // Neither is used by any race binding.
+        js->rgbButtons[1] = 0; js->rgdwPOV[0] = 0xFFFFFFFF;
         if (Inject *inj = InjectBlock()) {
             for (int b = 0; b < 32; b++) if (inj->buttons & (1u << b)) js->rgbButtons[b] = 0x80;
             if (inj->pov != -1) js->rgdwPOV[0] = (DWORD)inj->pov;
