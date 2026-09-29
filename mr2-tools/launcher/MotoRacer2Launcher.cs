@@ -1,7 +1,7 @@
 // MotoRacer2Launcher.exe - one double-click: Moto Racer 2 (GOG) in widescreen 1440p/144 Hz with
 // DualSense / Xbox / keyboard controls. Replaces launch-mr2.ps1 + padprofile.ps1 + padhelper.ps1.
 //
-//  1. Starts moto.exe -skipintro -DontLimitFrameRate -D3D -FullScreen (dgVoodoo does the 1440p/144 Hz).
+//  1. Starts moto.exe (with its intro movie) -DontLimitFrameRate -D3D -FullScreen (dgVoodoo does the 1440p/144 Hz).
 //  2. Writes the Player-1 binding table for whichever pad is plugged in (re-written if you swap pads;
 //     a change takes effect at the next race start).
 //  3. While the game is in front: pad -> menu keys (D-pad arrows, A/Cross = ENTER, B/Circle/Menu/Options
@@ -127,7 +127,7 @@ static class Launcher
             knownBuild = BitConverter.ToString(md5.ComputeHash(s)).Replace("-", "").StartsWith(GogMd5Prefix);
         if (Process.GetProcessesByName("moto").Length > 0) { Fail("Moto Racer 2 is already running."); return; }
 
-        var game = Process.Start(new ProcessStartInfo(GameExe, "-skipintro -DontLimitFrameRate -D3D -FullScreen") { WorkingDirectory = GameDir, UseShellExecute = false });
+        var game = Process.Start(new ProcessStartInfo(GameExe, "-DontLimitFrameRate -D3D -FullScreen") { WorkingDirectory = GameDir, UseShellExecute = false });
         for (int i = 0; i < 300 && !game.HasExited && game.MainWindowHandle == IntPtr.Zero; i++) { Thread.Sleep(100); game.Refresh(); }
 
         var started = Stopwatch.StartNew();
