@@ -28,7 +28,8 @@ $P1 = 0x6421CB
 # [code, flag] per function; flag C0/A0 = axis -/+, 0 = button
 $layouts = @{
   # DirectInput DualSense: 1 Sq 2 X 3 O 4 Tri 5 L1 6 R1 7 L2 8 R2
-  dualsense = @(@(1,0xC0),@(1,0xA0),@(8,0),@(7,0),@(2,0),@(6,0),@(5,0),@(4,0),@(1,0))
+  # as seen THROUGH the dinput.dll proxy (Xbox order): 1 Cross 2 Circle 3 Square 4 Tri - matches the launcher
+  dualsense = @(@(1,0xC0),@(1,0xA0),@(8,0),@(7,0),@(1,0),@(6,0),@(5,0),@(4,0),@(3,0))
   # DirectInput Xbox: 1 A 2 B 3 X 4 Y 5 LB 6 RB 7 View 8 Menu. ACCEL/BRAKE entries here are replaced below.
   xbox      = @(@(1,0xC0),@(1,0xA0),@(3,0xC0),@(3,0xA0),@(1,0),@(6,0),@(5,0),@(4,0),@(3,0))
 }
