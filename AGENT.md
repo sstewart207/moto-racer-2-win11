@@ -35,17 +35,19 @@
 * **Regional Difference:** GOG ships the European PAL version (Christophe Rime jazz/fusion score, 2:30 generic video). The North American release has licensed punk rock by *The V-Town Have-Nots: "Unnatural Selection"* and a 1:07 intro cutscene.
 * **Engine Boot Sequence Disassembly (`0x462BF6`):**
   * The engine queues: `data\ea.avi` -> `data\dsi.avi` -> `data\intro.avi`.
-  * If `ea.avi` is missing, the MCI player fails immediately and jumps straight to the menu screen.
+  * If `ea.avi` or `dsi.avi` is missing, the MCI player fails immediately and aborts the entire queue.
+  * To bypass the 26-second European Delphine Software logo cinematic (`dsi.avi`) and EA logo (`ea.avi`) without breaking the MCI player queue, both were replaced with 0.05-second instant-skip dummy AVIs.
+  * Result: The authentic North American intro movie (`intro.avi`) plays immediately upon launch with zero delay.
 * **CD Track Configuration (`data\cdtrack.txt`):**
   * `MENU 2` -> Plays `02.wav` (The V-Town Have-Nots: *"Unnatural Selection"*, 3:32 studio master).
   * Race tracks (`GRDPRIX`, `FOREST`, `AMAZSPD`, `AMAZDRT`, `BRITSPD`, `BRITDRT`, `SAHASPD`, `SAHADRT`) mapped to `-1` to silence in-race background music while keeping full 3D motorcycle and environment sound effects.
 * **Deployed Files:**
-  * `C:\GOG Games\Moto Racer 2\data\ea.avi` (EA logo, re-encoded with 44.1 kHz stereo PCM).
-  * `C:\GOG Games\Moto Racer 2\data\dsi.avi` (Delphine logo, re-encoded with 44.1 kHz stereo PCM).
+  * `C:\GOG Games\Moto Racer 2\data\ea.avi` (0.05s instant dummy skip).
+  * `C:\GOG Games\Moto Racer 2\data\dsi.avi` (0.05s instant dummy skip).
   * `C:\GOG Games\Moto Racer 2\data\intro.avi` (1m 07s retail cutscene with The V-Town Have-Nots: *"Unnatural Selection"*, 44.1 kHz stereo PCM).
   * `C:\GOG Games\Moto Racer 2\data\generic.avi` (Attract mode cutscene).
   * `C:\GOG Games\Moto Racer 2\02.wav` (Full 3:32 studio master of *"Unnatural Selection"* for menu music).
-  * Backups: `cdtrack.txt.orig`, `generic.avi.gog.bak`, `02.wav.pal.bak`.
+  * Backups: `ea.avi.bak`, `dsi.avi.bak`, `cdtrack.txt.orig`, `generic.avi.gog.bak`, `02.wav.pal.bak`.
 
 ---
 
