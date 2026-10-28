@@ -1,0 +1,20 @@
+# The figures are index of audio tracks of CDROM
+# Do not change the order of following lines
+# Names are only for information
+# The figures are important
+# For not playing an audio track, put minus one
+# If number is zero, the track is choosen randomely
+# The track one is for data but it can be used 
+# with an audio CD
+MENU	2
+WINNER	3
+LOOSER	4
+TOP5	5
+GRDPRIX	-1
+FOREST	-1
+AMAZSPD	-1
+AMAZDRT	-1
+BRITSPD	-1
+BRITDRT	-1
+SAHASPD	-1
+SAHADRT	-1
