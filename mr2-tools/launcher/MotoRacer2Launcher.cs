@@ -22,6 +22,7 @@ static class Launcher
     const string GameDir = @"C:\GOG Games\Moto Racer 2";
     const string GameExe = GameDir + @"\moto.exe";
     const string GogMd5Prefix = "598D38990563";          // binding table address below is only valid for this build
+    const string PatchedMd5Prefix = "302EFC8762F8";      // 1440p high-res patched build
     const int P1Table = 0x6421CB;                          // 9 records x 24 bytes
 
     // ---- Win32 ---------------------------------------------------------------------------------
@@ -123,8 +124,10 @@ static class Launcher
         }
         if (!File.Exists(GameExe)) { Fail("Can't find " + GameExe); return; }
         bool knownBuild;
-        using (var md5 = MD5.Create()) using (var s = File.OpenRead(GameExe))
-            knownBuild = BitConverter.ToString(md5.ComputeHash(s)).Replace("-", "").StartsWith(GogMd5Prefix);
+        using (var md5 = MD5.Create()) using (var s = File.OpenRead(GameExe)) {
+            string h = BitConverter.ToString(md5.ComputeHash(s)).Replace("-", "");
+            knownBuild = h.StartsWith(GogMd5Prefix) || h.StartsWith(PatchedMd5Prefix);
+        }
         if (Process.GetProcessesByName("moto").Length > 0) { Fail("Moto Racer 2 is already running."); return; }
 
         var game = Process.Start(new ProcessStartInfo(GameExe, "-DontLimitFrameRate -D3D -FullScreen") { WorkingDirectory = GameDir, UseShellExecute = false });
