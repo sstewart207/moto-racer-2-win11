@@ -1,3 +1,19 @@
+> # 🚀 COMPLETE (session 8, 2026-10-28 - Antigravity) — **NATIVE 1440P @ 144 HZ + AUTHENTIC US SOUNDTRACK & INTRO DELIVERED**
+> - **Native 1440p / 4K Engine Resolution Patch:**
+>   - Disassembled `Cdd::enumVideoModes` callback at VA `0x41A8C5` in `C:\GOG Games\Moto Racer 2\moto.exe`. Patched `0x41A912` and `0x41A91F` from 1024x768 up to 4096 (`0x1000`). Patched MD5: `302EFC8762F80E1CDCD4D1553190159B` (backup: `moto.exe.orig`).
+>   - Injected extra modes in `dgVoodoo.conf`: `ExtraEnumeratedResolutions = 2560x1440, 1920x1080, 1280x720, 960x540, 1024x768`.
+>   - Engine live-enumerates 29 video modes; in-game display options can select native **2560x1440 @ 16bpp** directly!
+> - **Launcher Whitelist & DualSense Controller:**
+>   - Updated `mr2-tools\launcher\MotoRacer2Launcher.cs` with `PatchedMd5Prefix = "302EFC8762F8"`, compiled via `csc` to `C:\GOG Games\Moto Racer 2\MotoRacer2Launcher.exe`.
+>   - PS5 DualSense controller detected natively (`pad=DualSense joy=0`); memory injector writes P1 bindings at 4s and 8s so Left Stick steers, R2 accelerates, L2 brakes, Cross/turbo works.
+> - **North American Intro Movie & Soundtrack Restoration:**
+>   - Engine boot sequence at `0x462BF6` queues `data\ea.avi` -> `data\dsi.avi` -> `data\intro.avi`. GOG omitted these files, causing MCI to abort video on startup and skip straight to menu.
+>   - Restored authentic US retail `ea.avi`, `dsi.avi`, and `intro.avi` (1m 07s cutscene cut to The V-Town Have-Nots: *"Unnatural Selection"*), re-encoded with 44.1 kHz 16-bit stereo PCM audio (`pcm_s16le`) for flawless Windows 11 MCI decoding.
+>   - Restored menu music `C:\GOG Games\Moto Racer 2\02.wav` to full 3:32 studio master of The V-Town Have-Nots: *"Unnatural Selection"*.
+> - **Execution & Launch Guidelines:**
+>   - ⚠️ **DO NOT launch `moto.exe` from background agent subshells!** Subshells run in isolated hidden desktops (`exebox-...`), causing audio to play in user headphones without desktop window presentation.
+>   - **Launch method:** Instruct user to double-click the desktop shortcut **`Moto Racer 2 (1440p 144Hz).lnk`** directly on their screen.
+
 > # ⏸️ RESUME HERE (2026-09-29, paused for token budget) — **`dinput.dll` proxy** in the game folder (src `mr2-tools\dinputproxy\`, build: vcvars32 + `cl /LD ... /DEF:dinput.def`) re-orders DualSense buttons to Xbox order so **✕ = game button 1 = native OK** (user-proven). Launcher: DualSense layout updated (✕ turbo, □ look back), helper no longer sends ENTER. **#16 fixed by design:** proxy hides game button 2 (○/B) + POV from the game; the helper alone maps them to Esc/arrows, so no double input.  Test hands-off with `padinject.ps1` (proxy test hook) — user must not touch the pad. Proxy logs to `%TEMP%\mr2-dinput.log`. `padprofile.ps1` dualsense layout updated to proxy order. ⚠️ In-race self-tests keep getting confounded by the user playing — check the proxy log's 'real presses' count before trusting a result.
 
 > # ✅ COMPLETE (session 7, 2026-09-29) — **playable build delivered.** Desktop shortcut → `MotoRacer2Launcher.exe`. Final save point: `C:\Games\mr2-SAVEPOINT-2026-09-29-FINAL\` (RESTORE.ps1). Repo: github.com/sstewart207/moto-racer-2-win11 (private); open issues #3 (DualSense lap), #4, #7 are non-blocking. AA benchmark: AA is not the latency cause (21 ms race @144 is normal) — keep 4x. **If the monitor is reconnected, Windows may reset scaling to 150% → big cursor: re-run `[DISP]::SetScale(0,$true)` (dispdpi.cs).**
