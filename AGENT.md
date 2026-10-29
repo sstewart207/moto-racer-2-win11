@@ -42,14 +42,16 @@
   * Result: The authentic North American "Gravity is Law" intro movie (`intro.avi`) plays immediately upon launch with zero delay.
 * **CD Track Configuration (`data\cdtrack.txt`):**
   * `MENU 2` -> Plays `02.wav` (The V-Town Have-Nots: *"Unnatural Selection"*, 3:32 studio master).
-  * Race tracks (`GRDPRIX`, `FOREST`, `AMAZSPD`, `AMAZDRT`, `BRITSPD`, `BRITDRT`, `SAHASPD`, `SAHADRT`) mapped to `-1` to silence in-race background music while keeping full 3D motorcycle and environment sound effects.
+  * Race tracks (`GRDPRIX`, `FOREST`, `AMAZSPD`, `AMAZDRT`, `BRITSPD`, `BRITDRT`, `SAHASPD`, `SAHADRT`) mapped to active tracks `03.wav` through `13.wav` (Authentic North American Redbook Audio album by The V-Town Have-Nots, extracted directly from the 1998 retail US CD).
+  * `WINNER 4`, `LOOSER 8`, `TOP5 11`.
 * **Deployed Files:**
   * `C:\GOG Games\Moto Racer 2\data\ea.avi` (0.05s instant dummy skip).
   * `C:\GOG Games\Moto Racer 2\data\dsi.avi` (0.05s instant dummy skip).
   * `C:\GOG Games\Moto Racer 2\data\intro.avi` (1m 07s American "Gravity is Law" cutscene with The V-Town Have-Nots: *"Unnatural Selection"*, `msvideo1` 600x480, 44.1 kHz stereo PCM).
   * `C:\GOG Games\Moto Racer 2\data\generic.avi` (Attract mode cutscene, also synced to "Gravity is Law").
   * `C:\GOG Games\Moto Racer 2\02.wav` (Full 3:32 studio master of *"Unnatural Selection"* for menu music).
-  * Backups: `ea.avi.bak`, `dsi.avi.bak`, `intro.avi.european.bak`, `cdtrack.txt.orig`, `generic.avi.gog.bak`, `02.wav.pal.bak`.
+  * `C:\GOG Games\Moto Racer 2\03.wav` - `15.wav` (Authentic 1998 US retail CD Redbook audio by The V-Town Have-Nots).
+  * Backups: `ea.avi.bak`, `dsi.avi.bak`, `intro.avi.european.bak`, `cdtrack.txt.silent.bak`, `cdtrack.txt.orig`, `generic.avi.gog.bak`, `02.wav.pal.bak`, `03.wav.pal.bak` - `15.wav.pal.bak`.
 
 ---
 
