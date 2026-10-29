@@ -41,11 +41,14 @@
     * **If `Version == 1` (EU / GOG edition):** branches at `0x462BEF` and queues **`data\Mix.avi`**!
   * Because the GOG edition sets `Version = 1` in the registry (required for GOG save decryption key `0x13364964`), the engine boots by playing `data\Mix.avi`.
   * The original European `Mix.avi` (24.6 MB, 100.8s) contained the European intro montage with real-life motorcycle cockpit windshield footage.
-  * To completely eliminate the European cutscene in both branches:
-    * `Mix.avi` is backed up to `Mix.avi.pal.bak` and replaced with the authentic North American "Gravity is Law" intro movie (`intro.avi`, 36.5 MB).
-    * `generic.avi` (attract mode) is also replaced with `intro.avi`.
-    * Both `ea.avi` and `dsi.avi` are 0.05-second instant-skip dummy AVIs.
-  * Result: Regardless of whether the engine runs the `Version=0` or `Version=1` branch, only the authentic North American "Gravity is Law" intro movie with The V-Town Have-Nots plays immediately upon launch with zero delay.
+  * **Video Codec Requirement for `AMMultiMediaStream`:**
+    * The game engine renders videos via DirectDraw media streams (`CLSID_AMMultiMediaStream` -> `IDirectDrawMediaStream`).
+    * DirectDraw streams reject raw `MSVC` (Microsoft Video 1) 600x480 at runtime. If `Mix.avi` uses an incompatible codec or non-standard resolution, `pAMStream->OpenFile` fails and the engine immediately aborts video playback, jumping straight to the Main Menu (State 8).
+    * `Mix.avi` must be encoded in the native **Motion JPEG (`MJPG`) 320x240 at 15 fps with 22.05 kHz 16-bit stereo PCM audio (`yuvj420p`)**.
+  * To completely eliminate the European cutscene and restore the American intro:
+    * `Mix.avi` is encoded from the authentic North American "Gravity is Law" master into `MJPG` 320x240 15 fps 22.05 kHz stereo (14.3 MB).
+    * `generic.avi` (attract mode) is also synced to this same "Gravity is Law" cutscene.
+  * Result: The authentic North American "Gravity is Law" intro movie with *The V-Town Have-Nots* plays immediately upon launch, and the European cockpit footage is 100% eliminated.
 * **CD Track Configuration (`data\cdtrack.txt`):**
   * `MENU 2` -> Plays `02.wav` (The V-Town Have-Nots: *"Unnatural Selection"*, 3:32 studio master).
   * Race tracks (`GRDPRIX`, `FOREST`, `AMAZSPD`, `AMAZDRT`, `BRITSPD`, `BRITDRT`, `SAHASPD`, `SAHADRT`) mapped to active tracks `03.wav` through `13.wav` (Authentic North American Redbook Audio album by The V-Town Have-Nots, extracted directly from the 1998 retail US CD).
