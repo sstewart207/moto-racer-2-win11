@@ -35,11 +35,17 @@
 * **Regional Distinction ("Rules" vs "Gravity is Law"):**
   * **European PAL Cutscene ("RULES"):** Opens with the tagline *"There are rules..."* / *"RULES"*, French Delphine animations, and Christophe Rime PAL synth soundtrack. Preserved as `intro.avi.european.bak`.
   * **American NTSC Cutscene ("GRAVITY IS LAW"):** Opens with the tagline *"Gravity is a law... We plead not guilty"* / *"GRAVITY IS LAW"*, fast-cut motocross action, and licensed punk rock by *The V-Town Have-Nots: "Unnatural Selection"*.
-* **Engine Boot Sequence Disassembly (`0x462BF6`):**
-  * The engine queues: `data\ea.avi` -> `data\dsi.avi` -> `data\intro.avi`.
-  * If `ea.avi` or `dsi.avi` is missing, the MCI player fails immediately and aborts the entire queue.
-  * To bypass the 26-second European Delphine Software logo cinematic (`dsi.avi`) and EA logo (`ea.avi`) without breaking the MCI player queue, both were replaced with 0.05-second instant-skip dummy AVIs.
-  * Result: The authentic North American "Gravity is Law" intro movie (`intro.avi`) plays immediately upon launch with zero delay.
+* **Engine Boot Sequence Disassembly (`0x462BD6` - `0x462C18`):**
+  * The engine checks registry `Version` (`[0x6594D0]`):
+    * **If `Version == 0` (US retail):** queues `data\ea.avi` -> `data\dsi.avi` -> `data\intro.avi`.
+    * **If `Version == 1` (EU / GOG edition):** branches at `0x462BEF` and queues **`data\Mix.avi`**!
+  * Because the GOG edition sets `Version = 1` in the registry (required for GOG save decryption key `0x13364964`), the engine boots by playing `data\Mix.avi`.
+  * The original European `Mix.avi` (24.6 MB, 100.8s) contained the European intro montage with real-life motorcycle cockpit windshield footage.
+  * To completely eliminate the European cutscene in both branches:
+    * `Mix.avi` is backed up to `Mix.avi.pal.bak` and replaced with the authentic North American "Gravity is Law" intro movie (`intro.avi`, 36.5 MB).
+    * `generic.avi` (attract mode) is also replaced with `intro.avi`.
+    * Both `ea.avi` and `dsi.avi` are 0.05-second instant-skip dummy AVIs.
+  * Result: Regardless of whether the engine runs the `Version=0` or `Version=1` branch, only the authentic North American "Gravity is Law" intro movie with The V-Town Have-Nots plays immediately upon launch with zero delay.
 * **CD Track Configuration (`data\cdtrack.txt`):**
   * `MENU 2` -> Plays `02.wav` (The V-Town Have-Nots: *"Unnatural Selection"*, 3:32 studio master).
   * Race tracks (`GRDPRIX`, `FOREST`, `AMAZSPD`, `AMAZDRT`, `BRITSPD`, `BRITDRT`, `SAHASPD`, `SAHADRT`) mapped to active tracks `03.wav` through `13.wav` (Authentic North American Redbook Audio album by The V-Town Have-Nots, extracted directly from the 1998 retail US CD).
@@ -48,10 +54,11 @@
   * `C:\GOG Games\Moto Racer 2\data\ea.avi` (0.05s instant dummy skip).
   * `C:\GOG Games\Moto Racer 2\data\dsi.avi` (0.05s instant dummy skip).
   * `C:\GOG Games\Moto Racer 2\data\intro.avi` (1m 07s American "Gravity is Law" cutscene with The V-Town Have-Nots: *"Unnatural Selection"*, `msvideo1` 600x480, 44.1 kHz stereo PCM).
+  * `C:\GOG Games\Moto Racer 2\data\Mix.avi` (Replaced with "Gravity is Law"; backup: `Mix.avi.pal.bak`).
   * `C:\GOG Games\Moto Racer 2\data\generic.avi` (Attract mode cutscene, also synced to "Gravity is Law").
   * `C:\GOG Games\Moto Racer 2\02.wav` (Full 3:32 studio master of *"Unnatural Selection"* for menu music).
   * `C:\GOG Games\Moto Racer 2\03.wav` - `15.wav` (Authentic 1998 US retail CD Redbook audio by The V-Town Have-Nots).
-  * Backups: `ea.avi.bak`, `dsi.avi.bak`, `intro.avi.european.bak`, `cdtrack.txt.silent.bak`, `cdtrack.txt.orig`, `generic.avi.gog.bak`, `02.wav.pal.bak`, `03.wav.pal.bak` - `15.wav.pal.bak`.
+  * Backups: `ea.avi.bak`, `dsi.avi.bak`, `intro.avi.european.bak`, `Mix.avi.pal.bak`, `cdtrack.txt.silent.bak`, `cdtrack.txt.orig`, `generic.avi.gog.bak`, `02.wav.pal.bak`, `03.wav.pal.bak` - `15.wav.pal.bak`.
 
 ---
 
